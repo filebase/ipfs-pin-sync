@@ -18,10 +18,11 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "@ipfs-shipyard/pinning-service-client": "^1.0.1",
+    "@popperjs/core": "^2.11.5",
     "bootstrap": "^5.2.0",
     "bootstrap-icons": "^1.9.1",
     "css-loader": "^6.7.1",
-    "style-loader": "^3.3.1",
-    "@ipfs-shipyard/pinning-service-client": "^1.0.1"
+    "style-loader": "^3.3.1"
   }
 }
