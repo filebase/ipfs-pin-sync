@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>IPFS Pin Sync</title>
 </head>
-<body style="background-color:#343A41;padding:20px;">
-<div class="container-fluid text-center border rounded" style="background-color:#E66A00;">
-    <h2 class="m-2 text-white">IPFS Pinning Service Synchronizer</h2>
+<body style="background-color: #343A41;padding:20px;">
+<div class="container-fluid text-center border rounded" style="background-color:#FFFFFF;">
+    <h2 class="m-2">IPFS Pinning Service Synchronizer</h2>
     <br/>
     <div class="row">
-        <div class="col border rounded m-2">
-            <h5 class="p-2 text-white">SOURCE PROVIDER</h5>
+        <div class="col-lg mt-2 mb-2">
+            <div class="d-grid gap-2 m-b-3 m-t-3 border rounded p-2" style="border-color:#343A41 !important;" style="height:100%">
+            <h5 class="p-2 ">SOURCE PROVIDER</h5>
             <form name="sourceLogin">
                 <div class="mb-3 row">
                     <label for="inputSourceEndpoint" class="col-sm-2 col-form-label">Endpoint</label>
@@ -29,7 +30,7 @@
                     <button type="submit" class="btn btn-primary" id="sourceSubmitButton">Login to Source</button>
                 </div>
             </form>
-            <table class="table table-bordered d-none text-white" id="sourceTable">
+            <table class="table table-bordered d-none " id="sourceTable">
                 <thead>
                 <tr>
                     <th scope="col">CID</th>
@@ -39,15 +40,17 @@
                 <tbody id="sourceTableBody">
                 </tbody>
             </table>
+            </div>
         </div>
-        <div class="col col-1 m-2">
-            <div class="d-grid gap-2 m-b-3 m-t-3 text-white" style="height:100%">
-                <button type="submit" class="btn btn-success disabled text-white" id="syncSubmitButton">Sync<br/><br/>
+        <div class="col-lg-1 mt-2 mb-2">
+            <div class="d-grid gap-2 m-b-3 m-t-3 p-2" style="height:100%">
+                <button type="submit" style="background-color: #E66A00;" class="btn btn-success disabled " id="syncSubmitButton">Sync<br/><br/>
                     <i class="bi bi-arrow-repeat"></i></button>
             </div>
         </div>
-        <div class="col border rounded m-2">
-            <h5 class="p-2 text-white">DESTINATION PROVIDER</h5>
+        <div class="col-lg mt-2 mb-2">
+            <div class="d-grid gap-2 m-b-3 m-t-3 border rounded p-2" style="border-color:#343A41 !important;" style="height:100%">
+            <h5 class="p-2">DESTINATION PROVIDER</h5>
             <form name="destinationLogin">
                 <div class="mb-3 row">
                     <label for="inputDestinationEndpoint" class="col-sm-2 col-form-label">Endpoint</label>
@@ -65,7 +68,7 @@
                     <button type="submit" class="btn btn-primary" id="destinationSubmitButton">Login to Destination</button>
                 </div>
             </form>
-            <table class="table table-bordered d-none text-white" id="destinationTable">
+            <table class="table table-bordered d-none " id="destinationTable">
                 <thead>
                 <tr>
                     <th scope="col">CID</th>
@@ -75,7 +78,7 @@
                 <tbody id="destinationTableBody">
                 </tbody>
             </table>
-            <table class="table table-bordered d-none text-white" id="destinationProgress">
+            <table class="table table-bordered d-none " id="destinationProgress">
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
@@ -85,6 +88,7 @@
                 <tbody id="destinationProgressBody">
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>
