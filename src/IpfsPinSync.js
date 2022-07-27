@@ -97,7 +97,19 @@ export default class IpfsPinSync {
         // Loop over list of pins and pin to destinationClient
         let addPinRequests = [];
         let pinsAdded = 0;
+        let pinKeys = new Set();
+        let duplicateKeys = {};
         for (let sourcePin of sourcePins) {
+            // Check if pin name is a duplicate and rename accordingly
+            if (pinKeys.has(sourcePin.pin.name) === true) {
+                duplicateKeys[sourcePin.pin.name] = duplicateKeys[sourcePin.pin.name] || 0
+                duplicateKeys[sourcePin.pin.name] = duplicateKeys[sourcePin.pin.name] + 1
+                sourcePin.pin.name = `${sourcePin.pin.name} [${duplicateKeys[sourcePin.pin.name]}]`
+            }
+
+            // Add new duplicated name to pin key set to ensure no duplicates caused by renaming
+            pinKeys.add(sourcePin.pin.name);
+
             const pinPostOptions = {
                 pin: {
                     cid: sourcePin.pin.cid,
@@ -126,6 +138,7 @@ export default class IpfsPinSync {
             if (addPinRequests.length === 10) {
                 // Wait for all Add Request to Finish
                 await Promise.all(addPinRequests);
+                addPinRequests = [];
             }
         }
 

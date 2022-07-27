@@ -1,5 +1,4 @@
 import './sass/styles.scss';
-import "bootstrap"
 import IpfsPinSync from "./IpfsPinSync.js";
 
 const SOURCE_ENDPOINT = `https://api.pinata.cloud/psa`
