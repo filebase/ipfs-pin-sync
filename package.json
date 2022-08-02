@@ -23,6 +23,7 @@
     "@popperjs/core": "^2.11.5",
     "bootstrap": "^5.2.0",
     "bootstrap-icons": "^1.9.1",
+    "bottleneck": "^2.19.5",
     "css-loader": "^6.7.1",
     "style-loader": "^3.3.1"
   }

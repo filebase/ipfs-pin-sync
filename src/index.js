@@ -140,10 +140,10 @@ async function syncProviders() {
         // Update Table of Pinned Content
         destinationProgressBody.innerHTML = `<tr>
                     <th scope="row">Percent</th>
-                    <td>${progressData.percent}%</td>
+                    <td>${progressData.percent.toFixed(2)}%</td>
                 </tr><tr>
                     <th scope="row">Count</th>
-                    <td>${progressData.count}%</td>
+                    <td>${progressData.count}</td>
                 </tr>`;
     });
 }

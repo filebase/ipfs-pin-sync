@@ -1,4 +1,5 @@
 import { Configuration, RemotePinningServiceClient, Status } from '@ipfs-shipyard/pinning-service-client'
+import Bottleneck from "bottleneck";
 
 export default class IpfsPinSync {
     constructor (sourceConfigOptions, destinationConfigOptions) {
@@ -34,6 +35,8 @@ export default class IpfsPinSync {
         if (!destinationConfigOptions.accessToken) {
             throw new Error(`Destination accessToken must be set`)
         }
+
+        this.destinationConfig = destinationConfigOptions;
 
         const destinationConfig = new Configuration({
             endpointUrl: destinationConfigOptions.endpointUrl, // the URI for your pinning provider, e.g. `http://localhost:3000`
@@ -83,7 +86,8 @@ export default class IpfsPinSync {
 
             earliestPinInList = this.#getOldestPinCreateDate(results)
 
-            if (results.length !== 1000) {
+            console.log(`Results Length: ${results.size}`)
+            if (results.size !== 1000) {
                 pinsExistToCheck = false;
             }
         }
@@ -92,6 +96,14 @@ export default class IpfsPinSync {
     }
 
     async sync (progressCallback) {
+        const syncLimiter = new Bottleneck({
+            reservoir: 25,
+            reservoirRefreshInterval: 1000,
+            reservoirRefreshAmount: 25,
+            maxConcurrent: 10
+        })
+        const throttledAddPin = syncLimiter.wrap(this.#addPin);
+
         const sourcePins = await this.listSource();
 
         // Loop over list of pins and pin to destinationClient
@@ -100,15 +112,17 @@ export default class IpfsPinSync {
         let pinKeys = new Set();
         let duplicateKeys = {};
         for (let sourcePin of sourcePins) {
-            // Check if pin name is a duplicate and rename accordingly
-            if (pinKeys.has(sourcePin.pin.name) === true) {
-                duplicateKeys[sourcePin.pin.name] = duplicateKeys[sourcePin.pin.name] || 0
-                duplicateKeys[sourcePin.pin.name] = duplicateKeys[sourcePin.pin.name] + 1
-                sourcePin.pin.name = `${sourcePin.pin.name} [${duplicateKeys[sourcePin.pin.name]}]`
-            }
+            if (this.destinationConfig.endpointUrl.includes('.filebase.') || this.destinationConfig.endpointUrl.includes('.fbase.')) {
+                // Check if pin name is a duplicate and rename accordingly
+                if (pinKeys.has(sourcePin.pin.name) === true) {
+                    duplicateKeys[sourcePin.pin.name] = duplicateKeys[sourcePin.pin.name] || 0
+                    duplicateKeys[sourcePin.pin.name] = duplicateKeys[sourcePin.pin.name] + 1
+                    sourcePin.pin.name = `${sourcePin.pin.name} [${duplicateKeys[sourcePin.pin.name]}]`
+                }
 
-            // Add new duplicated name to pin key set to ensure no duplicates caused by renaming
-            pinKeys.add(sourcePin.pin.name);
+                // Add new duplicated name to pin key set to ensure no duplicates caused by renaming
+                pinKeys.add(sourcePin.pin.name);
+            }
 
             const pinPostOptions = {
                 pin: {
@@ -119,7 +133,7 @@ export default class IpfsPinSync {
                 }
             }
 
-            const addPinRequest = this.addPin(pinPostOptions);
+            const addPinRequest = throttledAddPin(this.destinationClient, pinPostOptions);
 
             // Provide Progress Updates
             addPinRequest.then(() => {
@@ -133,13 +147,6 @@ export default class IpfsPinSync {
             })
 
             addPinRequests.push(addPinRequest);
-
-            //Batch in Requests of 10
-            if (addPinRequests.length === 10) {
-                // Wait for all Add Request to Finish
-                await Promise.all(addPinRequests);
-                addPinRequests = [];
-            }
         }
 
         // Wait for all Add Request to Finish
@@ -148,7 +155,7 @@ export default class IpfsPinSync {
         return true;
     }
 
-    async addPin (pinPostOptions) {
-        await this.destinationClient.pinsPost(pinPostOptions);
+    async #addPin (client, pinPostOptions) {
+        await client.pinsPost(pinPostOptions);
     }
 }
