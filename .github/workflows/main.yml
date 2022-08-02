@@ -1,0 +1,41 @@
+name: Build and GH-Page Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Install
+        run: npm install
+
+      - name: Build
+        run: |
+          npm run build
+
+      - name: Deploy to GH Page
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: gh-pages
+          folder: dist
+
+      - name: IPFS Publish
+        id: IPFS
+        uses: filebase/ipfs-action@filebase-changes-draft
+        with:
+          path: 'dist'
+          service: 'filebase'
+          verbose: true
+          pinName: 'ipfs-pin-sync'
+          filebaseBucket: ${{ secrets.FILEBASE_BUCKET }}
+          filebaseKey: ${{ secrets.FILEBASE_KEY }}
+          filebaseSecret: ${{ secrets.FILEBASE_SECRET }}
