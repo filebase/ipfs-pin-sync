@@ -1,4 +1,5 @@
-import './sass/styles.scss';
+import './main.css';
+import FilebaseLogo from './images/filebase-logo.svg'
 import IpfsPinSync from "./IpfsPinSync.js";
 
 const SOURCE_ENDPOINT = `https://api.pinata.cloud/psa`
@@ -57,6 +58,9 @@ async function loadSource() {
     syncConfig.source.endpointUrl = sourceLoginForm.elements.endpoint.value;
     syncConfig.source.accessToken = sourceLoginForm.elements.token.value;
 
+    console.log(syncConfig.source.endpointUrl)
+    console.log(syncConfig.source.accessToken)
+    console.log(syncConfig.source)
     // Start new Sync Client
     const ipfsSyncClient = new IpfsPinSync(syncConfig.source);
 
@@ -65,8 +69,8 @@ async function loadSource() {
     let sourceHTML = [];
     for (let sourceItem of sourceList) {
         sourceHTML.push(`<tr>
-                <th scope="row">${sourceItem.pin.cid}</th>
-                <td>${sourceItem.pin.name}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-xs text-gray-500">${sourceItem.pin.cid}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-xs text-gray-500">${sourceItem.pin.name}</td>
             </tr>`)
     }
 
@@ -76,14 +80,14 @@ async function loadSource() {
     sourceTableBody.innerHTML = sourceHTML.join('');
 
     // Change Visibility of Login Form and Table
-    sourceLoginForm.classList.add("d-none");
-    sourceTable.classList.remove("d-none");
+    // sourceLoginForm.classList.add("d-none");
+    // sourceTable.classList.remove("d-none");
 
     // Mark Source Pinning Service as Connected
-    syncConfig.source.connected = true;
+    // syncConfig.source.connected = true;
 
     // Run Enable Sync Button Check
-    enableSyncButton();
+    // enableSyncButton();
 }
 
 async function loadDestination() {
@@ -100,8 +104,8 @@ async function loadDestination() {
     let destinationHTML = [];
     for (let destinationItem of destinationList) {
         destinationHTML.push(`<tr>
-                <th scope="row">${destinationItem.pin.cid}</th>
-                <td>${destinationItem.pin.name}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-xs text-gray-500">${destinationItem.pin.cid}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-xs text-gray-500">${destinationItem.pin.name}</td>
             </tr>`)
     }
 
@@ -128,22 +132,25 @@ async function syncProviders() {
     const ipfsSyncClient = new IpfsPinSync(syncConfig.source, syncConfig.destination);
 
     // Tracked DOM Elements
-    let destinationProgressBody = document.getElementById("destinationProgressBody");
+    // let destinationProgressBody = document.getElementById("destinationProgressBody");
     let destinationProgress = document.getElementById("destinationProgress");
-    let destinationTable = document.getElementById("destinationTable");
+    let destinationCount = document.getElementById("destinationCount");
+    // let destinationTable = document.getElementById("destinationTable");
 
     // Change Visibility of Login Form and Table
-    destinationTable.classList.add("d-none");
-    destinationProgress.classList.remove("d-none");
+    // destinationTable.classList.add("d-none");
+    // destinationProgress.classList.remove("d-none");
 
     return ipfsSyncClient.sync(function (progressData) {
         // Update Table of Pinned Content
-        destinationProgressBody.innerHTML = `<tr>
-                    <th scope="row">Percent</th>
-                    <td>${progressData.percent.toFixed(2)}%</td>
-                </tr><tr>
-                    <th scope="row">Count</th>
-                    <td>${progressData.count}</td>
-                </tr>`;
+        destinationProgress.textContent = `${progressData.percent}%`
+        destinationCount.textContent = progressData.count
+        // destinationProgress.innerHTML = `<tr>
+        //             <th scope="row">Percent</th>
+        //             <td>${progressData.percent.toFixed(2)}%</td>
+        //         </tr><tr>
+        //             <th scope="row">Count</th>
+        //             <td>${progressData.count}</td>
+        //         </tr>`;
     });
 }
