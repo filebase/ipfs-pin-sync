@@ -32,33 +32,6 @@
                   </div>
                 </div>
               </div>
-
-              <div class="-mr-2 flex md:hidden">
-                <!-- Mobile menu button -->
-                <button type="button"
-                  class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                  aria-controls="mobile-menu" aria-expanded="false">
-                  <span class="sr-only">Open main menu</span>
-                  <!--
-                    Heroicon name: outline/menu
-
-                    Menu open: "hidden", Menu closed: "block"
-                  -->
-                  <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                  <!--
-                    Heroicon name: outline/x
-
-                    Menu open: "block", Menu closed: "hidden"
-                  -->
-                  <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke-width="2" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -106,56 +79,6 @@
                     </form>
                   </div>
                 </div>
-
-                <!-- This example requires Tailwind CSS v2.0+ -->
-
-
-
-
-                <!-- <table class="table table-bordered d-none " id="sourceTable">
-                  <thead>
-                    <tr>
-                      <th scope="col">CID</th>
-                      <th scope="col">Name</th>
-                    </tr>
-                  </thead>
-                  <tbody id="sourceTableBody">
-                  </tbody>
-                </table> -->
-
-                <!-- <div class="d-grid gap-2 m-b-3 m-t-3 border rounded p-2" style="border-color:#343A41 !important;"
-                  style="height:100%">
-
-                  <form name="sourceLogin">
-                    <div class="mb-3 row">
-                      <label for="inputSourceEndpoint" class="col-sm-2 col-form-label">Endpoint</label>
-                      <div class="col-sm-10">
-                        <input type="text" name="endpoint" class="form-control" id="inputSourceEndpoint"
-                          placeholder="https://api.pinata.cloud/psa" value="https://api.pinata.cloud/psa">
-                      </div>
-                    </div>
-                    <div class="mb-3 row">
-                      <label for="inputSourceToken" class="col-sm-2 col-form-label">Token</label>
-                      <div class="col-sm-10">
-                        <input type="password" name="token" class="form-control" id="inputSourceToken">
-                      </div>
-                    </div>
-                    <div class="d-grid gap-2 mb-3">
-                      <button type="submit" class="btn btn-primary" id="sourceSubmitButton">Login
-                        to Source</button>
-                    </div>
-                  </form>
-                  <table class="table table-bordered d-none " id="sourceTable">
-                    <thead>
-                      <tr>
-                        <th scope="col">CID</th>
-                        <th scope="col">Name</th>
-                      </tr>
-                    </thead>
-                    <tbody id="sourceTableBody">
-                    </tbody>
-                  </table>
-                </div> -->
               </div>
               <div>
                 <div class="mx-auto text-center">
@@ -164,7 +87,6 @@
                       class="disabled inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#ffa500]">
                       Sync
                     </button>
-                    <!-- This example requires Tailwind CSS v2.0+ -->
                     <div>
                       <dl class="mt-5 grid grid-cols-2 gap-5">
                         <div class="px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6">
@@ -179,29 +101,7 @@
                       </dl>
                     </div>
                   </div>
-
-                  <!-- <table class="table table-bordered d-none" id="destinationProgress">
-                    <thead>
-                      <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Value</th>
-                      </tr>
-                    </thead>
-                    <tbody id="destinationProgressBody">
-                      <tr>
-                        <th scope="row">Percent</th>
-                        <td>100.00%</td>
-                      </tr>
-                    </tbody>
-                  </table> -->
                 </div>
-
-                <!-- <div class="d-grid gap-2 m-b-3 m-t-3 p-2" style="height:100%"> -->
-                <!-- <button type="submit" style="background-color: #E66A00;" class="btn btn-success disabled"
-
-                    id="syncSubmitButton">Sync<br /><br />
-                    <i class="bi bi-arrow-repeat"></i></button> -->
-                <!-- </div> -->
               </div>
               <div>
                 <div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -234,53 +134,9 @@
                     </form>
                   </div>
                 </div>
-
-                <!-- <div class="d-grid gap-2 m-b-3 m-t-3 border rounded p-2" style="border-color:#343A41 !important;"
-                  style="height:100%">
-                  <h5 class="p-2">DESTINATION PROVIDER</h5>
-                  <form name="destinationLogin">
-                    <div class="mb-3 row">
-                      <label for="inputDestinationEndpoint" class="col-sm-2 col-form-label">Endpoint</label>
-                      <div class="col-sm-10">
-                        <input type="text" name="endpoint" class="form-control" id="inputDestinationEndpoint"
-                          placeholder="https://api.filebase.io/v1/ipfs" value="https://api.filebase.io/v1/ipfs">
-                      </div>
-                    </div>
-                    <div class="mb-3 row">
-                      <label for="inputDestinationToken" class="col-sm-2 col-form-label">Token</label>
-                      <div class="col-sm-10">
-                        <input type="password" name="token" class="form-control" id="inputDestinationToken">
-                      </div>
-                    </div>
-                    <div class="d-grid gap-2 mb-3">
-                      <button type="submit" class="btn btn-primary" id="destinationSubmitButton">Login to
-                        Destination</button>
-                    </div>
-                  </form>
-                  <table class="table table-bordered d-none " id="destinationTable">
-                    <thead>
-                      <tr>
-                        <th scope="col">CID</th>
-                        <th scope="col">Name</th>
-                      </tr>
-                    </thead>
-                    <tbody id="destinationTableBody">
-                    </tbody>
-                  </table>
-
-                </div> -->
               </div>
             </div>
-
-
-
-
-
-
-
-
           </div>
-          <!-- border-4 border-dashed border-gray-200 rounded-lg  -->
           <div class="grid grid-cols-2 gap-4">
             <div>
               <div class="px-4 sm:px-6 lg:px-8">

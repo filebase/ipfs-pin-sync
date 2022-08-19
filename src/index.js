@@ -43,24 +43,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
     });
 })
 
-function enableSyncButton() {
-    if (syncConfig.source.connected === true && syncConfig.destination.connected === true) {
-        let syncButton = document.getElementById("syncSubmitButton");
-
-        // Change Visibility of Login Form and Table
-        syncButton.classList.remove("disabled");
-    }
-}
-
 async function loadSource() {
     // Get Credentials from Form
     let sourceLoginForm = document.forms.sourceLogin;
     syncConfig.source.endpointUrl = sourceLoginForm.elements.endpoint.value;
     syncConfig.source.accessToken = sourceLoginForm.elements.token.value;
 
-    console.log(syncConfig.source.endpointUrl)
-    console.log(syncConfig.source.accessToken)
-    console.log(syncConfig.source)
     // Start new Sync Client
     const ipfsSyncClient = new IpfsPinSync(syncConfig.source);
 
@@ -78,16 +66,6 @@ async function loadSource() {
     let sourceTableBody = document.getElementById("sourceTableBody");
     let sourceTable = document.getElementById("sourceTable");
     sourceTableBody.innerHTML = sourceHTML.join('');
-
-    // Change Visibility of Login Form and Table
-    // sourceLoginForm.classList.add("d-none");
-    // sourceTable.classList.remove("d-none");
-
-    // Mark Source Pinning Service as Connected
-    // syncConfig.source.connected = true;
-
-    // Run Enable Sync Button Check
-    // enableSyncButton();
 }
 
 async function loadDestination() {
@@ -119,12 +97,6 @@ async function loadDestination() {
     destinationLoginForm.classList.add("d-none");
     destinationProgress.classList.add("d-none");
     destinationTable.classList.remove("d-none");
-
-    // Mark Destination Pinning Service as Connected
-    syncConfig.destination.connected = true;
-
-    // Run Enable Sync Button Check
-    enableSyncButton();
 }
 
 async function syncProviders() {
@@ -132,25 +104,12 @@ async function syncProviders() {
     const ipfsSyncClient = new IpfsPinSync(syncConfig.source, syncConfig.destination);
 
     // Tracked DOM Elements
-    // let destinationProgressBody = document.getElementById("destinationProgressBody");
     let destinationProgress = document.getElementById("destinationProgress");
     let destinationCount = document.getElementById("destinationCount");
-    // let destinationTable = document.getElementById("destinationTable");
-
-    // Change Visibility of Login Form and Table
-    // destinationTable.classList.add("d-none");
-    // destinationProgress.classList.remove("d-none");
 
     return ipfsSyncClient.sync(function (progressData) {
-        // Update Table of Pinned Content
+        // Update Pinned Content Progress
         destinationProgress.textContent = `${progressData.percent}%`
         destinationCount.textContent = progressData.count
-        // destinationProgress.innerHTML = `<tr>
-        //             <th scope="row">Percent</th>
-        //             <td>${progressData.percent.toFixed(2)}%</td>
-        //         </tr><tr>
-        //             <th scope="row">Count</th>
-        //             <td>${progressData.count}</td>
-        //         </tr>`;
     });
 }
