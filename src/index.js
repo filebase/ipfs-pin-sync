@@ -1,4 +1,5 @@
-import './sass/styles.scss';
+import './main.css';
+import FilebaseLogo from './images/filebase-logo.svg'
 import IpfsPinSync from "./IpfsPinSync.js";
 
 const SOURCE_ENDPOINT = `https://api.pinata.cloud/psa`
@@ -42,15 +43,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     });
 })
 
-function enableSyncButton() {
-    if (syncConfig.source.connected === true && syncConfig.destination.connected === true) {
-        let syncButton = document.getElementById("syncSubmitButton");
-
-        // Change Visibility of Login Form and Table
-        syncButton.classList.remove("disabled");
-    }
-}
-
 async function loadSource() {
     // Get Credentials from Form
     let sourceLoginForm = document.forms.sourceLogin;
@@ -65,8 +57,8 @@ async function loadSource() {
     let sourceHTML = [];
     for (let sourceItem of sourceList) {
         sourceHTML.push(`<tr>
-                <th scope="row">${sourceItem.pin.cid}</th>
-                <td>${sourceItem.pin.name}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-xs text-gray-500">${sourceItem.pin.cid}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-xs text-gray-500">${sourceItem.pin.name}</td>
             </tr>`)
     }
 
@@ -74,16 +66,6 @@ async function loadSource() {
     let sourceTableBody = document.getElementById("sourceTableBody");
     let sourceTable = document.getElementById("sourceTable");
     sourceTableBody.innerHTML = sourceHTML.join('');
-
-    // Change Visibility of Login Form and Table
-    sourceLoginForm.classList.add("d-none");
-    sourceTable.classList.remove("d-none");
-
-    // Mark Source Pinning Service as Connected
-    syncConfig.source.connected = true;
-
-    // Run Enable Sync Button Check
-    enableSyncButton();
 }
 
 async function loadDestination() {
@@ -100,8 +82,8 @@ async function loadDestination() {
     let destinationHTML = [];
     for (let destinationItem of destinationList) {
         destinationHTML.push(`<tr>
-                <th scope="row">${destinationItem.pin.cid}</th>
-                <td>${destinationItem.pin.name}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-xs text-gray-500">${destinationItem.pin.cid}</td>
+                <td class="whitespace-nowrap px-3 py-4 text-xs text-gray-500">${destinationItem.pin.name}</td>
             </tr>`)
     }
 
@@ -115,12 +97,6 @@ async function loadDestination() {
     destinationLoginForm.classList.add("d-none");
     destinationProgress.classList.add("d-none");
     destinationTable.classList.remove("d-none");
-
-    // Mark Destination Pinning Service as Connected
-    syncConfig.destination.connected = true;
-
-    // Run Enable Sync Button Check
-    enableSyncButton();
 }
 
 async function syncProviders() {
@@ -128,22 +104,12 @@ async function syncProviders() {
     const ipfsSyncClient = new IpfsPinSync(syncConfig.source, syncConfig.destination);
 
     // Tracked DOM Elements
-    let destinationProgressBody = document.getElementById("destinationProgressBody");
     let destinationProgress = document.getElementById("destinationProgress");
-    let destinationTable = document.getElementById("destinationTable");
-
-    // Change Visibility of Login Form and Table
-    destinationTable.classList.add("d-none");
-    destinationProgress.classList.remove("d-none");
+    let destinationCount = document.getElementById("destinationCount");
 
     return ipfsSyncClient.sync(function (progressData) {
-        // Update Table of Pinned Content
-        destinationProgressBody.innerHTML = `<tr>
-                    <th scope="row">Percent</th>
-                    <td>${progressData.percent.toFixed(2)}%</td>
-                </tr><tr>
-                    <th scope="row">Count</th>
-                    <td>${progressData.count}</td>
-                </tr>`;
+        // Update Pinned Content Progress
+        destinationProgress.textContent = `${progressData.percent}%`
+        destinationCount.textContent = progressData.count
     });
 }

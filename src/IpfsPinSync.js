@@ -72,7 +72,7 @@ export default class IpfsPinSync {
         while (pinsExistToCheck === true) {
             // Get 1000 Successful Pins
             let pinsGetOptions = {
-                limit: 1000,
+                limit: 500,
                 status: new Set([Status.Pinned, Status.Pinning, Status.Queued]) // requires a set, and not an array
             }
             if (earliestPinInList != null) {
