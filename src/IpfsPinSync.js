@@ -56,13 +56,74 @@ export default class IpfsPinSync {
         return oldestCreateDate
     }
 
-    listSource () {
-        return this.#list(this.sourceClient);
+  listSource() {
+    if (
+      this.sourceConfig.configuration.endpointUrl.indexOf(
+        "api.pinata.cloud"
+      ) !== -1
+    ) {
+      return this.#pinataList(this.sourceConfig.configuration);
     }
 
-    listDestination () {
-        return this.#list(this.destinationClient);
+    return this.#list(this.sourceClient);
+  }
+
+  listDestination() {
+    if (
+      this.destinationConfig.configuration.endpointUrl.indexOf(
+        "api.pinata.cloud"
+      ) !== -1
+    ) {
+      return this.#pinataList(this.destinationConfig.configuration);
     }
+
+    return this.#list(this.destinationClient);
+  }
+
+  async #pinataList(config) {
+    let listConfig = {
+      method: "GET",
+      baseURL: "https://api.pinata.cloud",
+      url: "/data/pinList",
+      headers: {
+        Authorization: `Bearer ${config.accessToken}`,
+      },
+      params: {
+        status: "pinned",
+        pageLimit: 10,
+        pageOffset: 0,
+        includeCount: "false",
+      },
+    };
+
+    let pinsExistToCheck = true;
+    let pageCount = 0;
+    let pinList = [];
+
+    while (pinsExistToCheck === true) {
+      //Request Page of Pins from Provider
+      listConfig.pageOffset = pageCount;
+      const listRequest = await axios(listConfig);
+      for (let pin of listRequest.data.rows) {
+        pinList.push({
+          pin: {
+            cid: pin.ipfs_pin_hash,
+            name: pin.metadata.name || pin.ipfs_pin_hash,
+          },
+        });
+      }
+
+      //Check if Page is Last Page
+      if (listRequest.data.rows.length < listConfig.params.pageLimit) {
+        pinsExistToCheck = false;
+      }
+
+      //Go to next page
+      pageCount++;
+    }
+
+    return pinList;
+  }
 
     async #list (client) {
         let pinsExistToCheck = true
