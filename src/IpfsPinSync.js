@@ -1,5 +1,6 @@
 import { Configuration, RemotePinningServiceClient, Status } from '@ipfs-shipyard/pinning-service-client'
 import Bottleneck from "bottleneck";
+import axios from "axios";
 
 export default class IpfsPinSync {
     constructor (sourceConfigOptions, destinationConfigOptions) {
@@ -20,12 +21,12 @@ export default class IpfsPinSync {
             throw new Error(`Source accessToken must be set`)
         }
 
-        const sourceConfig = new Configuration({
+        this.sourceConfig = new Configuration({
             endpointUrl: sourceConfigOptions.endpointUrl, // the URI for your pinning provider, e.g. `http://localhost:3000`
             accessToken: sourceConfigOptions.accessToken, // the secret token/key given to you by your pinning provider
         })
 
-        this.sourceClient = new RemotePinningServiceClient(sourceConfig)
+        this.sourceClient = new RemotePinningServiceClient(this.sourceConfig)
     }
 
     #connectToDestination(destinationConfigOptions) {
