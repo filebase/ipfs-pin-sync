@@ -23,7 +23,7 @@ export default class IpfsPinSync {
 
         this.sourceConfig = sourceConfigOptions
 
-       const sourceConfig = new Configuration({
+        const sourceConfig = new Configuration({
             endpointUrl: sourceConfigOptions.endpointUrl, // the URI for your pinning provider, e.g. `http://localhost:3000`
             accessToken: sourceConfigOptions.accessToken, // the secret token/key given to you by your pinning provider
         })
@@ -93,19 +93,19 @@ export default class IpfsPinSync {
         },
         params: {
           status: "pinned",
-          pageLimit: 250,
-          pageOffset: 0,
           includeCount: "false",
         },
       };
 
       let pinsExistToCheck = true;
-      let pageCount = 0;
+      let pageCount = 0,
+        pageLimit = 250;
       let pinList = [];
 
       while (pinsExistToCheck === true) {
         //Request Page of Pins from Provider
-        listConfig.pageOffset = pageCount;
+        listConfig.params.pageLimit = pageLimit;
+        listConfig.params.pageOffset = pageCount * pageLimit;
         const listRequest = await axios(listConfig);
         for (let pin of listRequest.data.rows) {
           pinList.push({
