@@ -21,12 +21,14 @@ export default class IpfsPinSync {
             throw new Error(`Source accessToken must be set`)
         }
 
-        this.sourceConfig = new Configuration({
+        this.sourceConfig = sourceConfigOptions
+
+       const sourceConfig = new Configuration({
             endpointUrl: sourceConfigOptions.endpointUrl, // the URI for your pinning provider, e.g. `http://localhost:3000`
             accessToken: sourceConfigOptions.accessToken, // the secret token/key given to you by your pinning provider
         })
 
-        this.sourceClient = new RemotePinningServiceClient(this.sourceConfig)
+        this.sourceClient = new RemotePinningServiceClient(sourceConfig)
     }
 
     #connectToDestination(destinationConfigOptions) {
@@ -59,11 +61,11 @@ export default class IpfsPinSync {
 
     listSource() {
       if (
-        this.sourceConfig.configuration.endpointUrl.indexOf(
+        this.sourceConfig.endpointUrl.indexOf(
           "api.pinata.cloud"
         ) !== -1
       ) {
-        return this.#pinataList(this.sourceConfig.configuration);
+        return this.#pinataList(this.sourceConfig);
       }
 
       return this.#list(this.sourceClient);
@@ -71,11 +73,11 @@ export default class IpfsPinSync {
 
     listDestination() {
       if (
-        this.destinationConfig.configuration.endpointUrl.indexOf(
+        this.destinationConfig.endpointUrl.indexOf(
           "api.pinata.cloud"
         ) !== -1
       ) {
-        return this.#pinataList(this.destinationConfig.configuration);
+        return this.#pinataList(this.destinationConfig);
       }
 
       return this.#list(this.destinationClient);
@@ -91,7 +93,7 @@ export default class IpfsPinSync {
         },
         params: {
           status: "pinned",
-          pageLimit: 10,
+          pageLimit: 250,
           pageOffset: 0,
           includeCount: "false",
         },
@@ -186,13 +188,16 @@ export default class IpfsPinSync {
                 pinKeys.add(sourcePin.pin.name);
             }
 
-            const pinPostOptions = {
+            let pinPostOptions = {
                 pin: {
                     cid: sourcePin.pin.cid,
                     name: sourcePin.pin.name,
-                    origins: sourcePin.pin.origins,
                     meta: sourcePin.pin.meta
                 }
+            }
+
+            if (sourcePin.pin.origins.length > 0) {
+              pinPostOptions.pin.origins = sourcePin.pin.origins;
             }
 
             const addPinRequest = throttledAddPin(this.destinationClient, pinPostOptions);
