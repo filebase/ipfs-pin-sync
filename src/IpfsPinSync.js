@@ -1,5 +1,6 @@
 import { Configuration, RemotePinningServiceClient, Status } from '@ipfs-shipyard/pinning-service-client'
 import Bottleneck from "bottleneck";
+import axios from "axios";
 
 export default class IpfsPinSync {
     constructor (sourceConfigOptions, destinationConfigOptions) {
@@ -19,6 +20,8 @@ export default class IpfsPinSync {
         if (!sourceConfigOptions.accessToken) {
             throw new Error(`Source accessToken must be set`)
         }
+
+        this.sourceConfig = sourceConfigOptions
 
         const sourceConfig = new Configuration({
             endpointUrl: sourceConfigOptions.endpointUrl, // the URI for your pinning provider, e.g. `http://localhost:3000`
@@ -56,12 +59,73 @@ export default class IpfsPinSync {
         return oldestCreateDate
     }
 
-    listSource () {
-        return this.#list(this.sourceClient);
+    listSource() {
+      if (
+        this.sourceConfig.endpointUrl.indexOf(
+          "api.pinata.cloud"
+        ) !== -1
+      ) {
+        return this.#pinataList(this.sourceConfig);
+      }
+
+      return this.#list(this.sourceClient);
     }
 
-    listDestination () {
-        return this.#list(this.destinationClient);
+    listDestination() {
+      if (
+        this.destinationConfig.endpointUrl.indexOf(
+          "api.pinata.cloud"
+        ) !== -1
+      ) {
+        return this.#pinataList(this.destinationConfig);
+      }
+
+      return this.#list(this.destinationClient);
+    }
+
+    async #pinataList(config) {
+      let listConfig = {
+        method: "GET",
+        baseURL: "https://api.pinata.cloud",
+        url: "/data/pinList",
+        headers: {
+          Authorization: `Bearer ${config.accessToken}`,
+        },
+        params: {
+          status: "pinned",
+          includeCount: "false",
+        },
+      };
+
+      let pinsExistToCheck = true;
+      let pageCount = 0,
+        pageLimit = 250;
+      let pinList = [];
+
+      while (pinsExistToCheck === true) {
+        //Request Page of Pins from Provider
+        listConfig.params.pageLimit = pageLimit;
+        listConfig.params.pageOffset = pageCount * pageLimit;
+        const listRequest = await axios(listConfig);
+        for (let pin of listRequest.data.rows) {
+          pinList.push({
+            pin: {
+              cid: pin.ipfs_pin_hash,
+              name: pin.metadata.name || pin.ipfs_pin_hash,
+            },
+          });
+        }
+
+        //Check if Page is Last Page
+        if (listRequest.data.rows.length < listConfig.params.pageLimit) {
+          pinsExistToCheck = false;
+        }
+
+        //Go to next page
+        pageCount++;
+      }
+
+      return pinList;
     }
 
     async #list (client) {
@@ -124,13 +188,16 @@ export default class IpfsPinSync {
                 pinKeys.add(sourcePin.pin.name);
             }
 
-            const pinPostOptions = {
+            let pinPostOptions = {
                 pin: {
                     cid: sourcePin.pin.cid,
                     name: sourcePin.pin.name,
-                    origins: sourcePin.pin.origins,
                     meta: sourcePin.pin.meta
                 }
+            }
+
+            if (sourcePin.pin.origins.length > 0) {
+              pinPostOptions.pin.origins = sourcePin.pin.origins;
             }
 
             const addPinRequest = throttledAddPin(this.destinationClient, pinPostOptions);
