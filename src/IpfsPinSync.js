@@ -84,6 +84,9 @@ export default class IpfsPinSync {
             console.log(count, results)
             pinList = pinList.concat(Array.from(results));
 
+            // Add delay when paginating to prevent pinata rate limit
+            await new Promise(r => setTimeout(r, 20_000));
+
             earliestPinInList = this.#getOldestPinCreateDate(results)
 
             console.log(`Results Length: ${results.size}`)
