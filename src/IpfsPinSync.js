@@ -169,7 +169,7 @@ export default class IpfsPinSync {
           earliestPinInList = this.#getOldestPinCreateDate(results)
 
           console.log(`Results Length: ${results.size}`)
-          if (results.size !== 1000) {
+          if (results.size !== 500) {
               pinsExistToCheck = false;
           }
       }
