@@ -99,14 +99,22 @@ export default class IpfsPinSync {
 
       let pinsExistToCheck = true;
       let pageCount = 0,
-        pageLimit = 250;
+        pageLimit = 1000;
       let pinList = [];
+
+      const listLimiter = new Bottleneck({
+        reservoir: 25,
+        reservoirRefreshInterval: 60 * 1000,
+        reservoirRefreshAmount: 25,
+        maxConcurrent: 1
+      });
+      const throttledListPins = listLimiter.wrap(axios);
 
       while (pinsExistToCheck === true) {
         //Request Page of Pins from Provider
         listConfig.params.pageLimit = pageLimit;
         listConfig.params.pageOffset = pageCount * pageLimit;
-        const listRequest = await axios(listConfig);
+        const listRequest = await throttledListPins(listConfig);
         for (let pin of listRequest.data.rows) {
           pinList.push({
             pin: {
@@ -129,34 +137,45 @@ export default class IpfsPinSync {
     }
 
     async #list (client) {
-        let pinsExistToCheck = true
-        let earliestPinInList = null
-        let pinList = [];
+      let pinsExistToCheck = true
+      let earliestPinInList = null
+      let pinList = [];
 
-        while (pinsExistToCheck === true) {
-            // Get 1000 Successful Pins
-            let pinsGetOptions = {
-                limit: 500,
-                status: new Set([Status.Pinned, Status.Pinning, Status.Queued]) // requires a set, and not an array
-            }
-            if (earliestPinInList != null) {
-                pinsGetOptions.before = earliestPinInList
-            }
+      const listLimiter = new Bottleneck({
+        reservoir: 25,
+        reservoirRefreshInterval: 10 * 1000,
+        reservoirRefreshAmount: 25,
+        maxConcurrent: 1
+      });
+      const throttledGetPins = listLimiter.wrap((options) => {
+        return client.pinsGet(options)
+      });
 
-            const {count, results} = await client.pinsGet(pinsGetOptions)
+      const pinsToBatch = 500;
+      while (pinsExistToCheck === true) {
+          // Get 500 Successful Pins
+          let pinsGetOptions = {
+              limit: pinsToBatch,
+              status: new Set([Status.Pinned, Status.Pinning, Status.Queued]) // requires a set, and not an array
+          }
+          if (earliestPinInList != null) {
+              pinsGetOptions.before = earliestPinInList
+          }
 
-            console.log(count, results)
-            pinList = pinList.concat(Array.from(results));
+          const {count, results} = await throttledGetPins(pinsGetOptions)
 
-            earliestPinInList = this.#getOldestPinCreateDate(results)
+          console.log(count, results)
+          pinList = pinList.concat(Array.from(results));
 
-            console.log(`Results Length: ${results.size}`)
-            if (results.size !== 1000) {
-                pinsExistToCheck = false;
-            }
-        }
+          earliestPinInList = this.#getOldestPinCreateDate(results)
 
-        return pinList;
+          console.log(`Results Length: ${results.size}`)
+          if (results.size !== pinsToBatch) {
+              pinsExistToCheck = false;
+          }
+      }
+
+      return pinList;
     }
 
     async sync (progressCallback) {
@@ -164,8 +183,8 @@ export default class IpfsPinSync {
             reservoir: 25,
             reservoirRefreshInterval: 1000,
             reservoirRefreshAmount: 25,
-            maxConcurrent: 10
-        })
+            maxConcurrent: 4
+        });
         const throttledAddPin = syncLimiter.wrap(this.#addPin);
 
         const sourcePins = await this.listSource();
