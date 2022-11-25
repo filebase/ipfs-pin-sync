@@ -137,9 +137,9 @@ export default class IpfsPinSync {
     }
 
     async #list (client) {
-        let pinsExistToCheck = true
-        let earliestPinInList = null
-        let pinList = [];
+      let pinsExistToCheck = true
+      let earliestPinInList = null
+      let pinList = [];
 
       const listLimiter = new Bottleneck({
         reservoir: 25,
@@ -147,32 +147,34 @@ export default class IpfsPinSync {
         reservoirRefreshAmount: 25,
         maxConcurrent: 1
       });
-      const throttledGetPins = listLimiter.wrap(client.pinsGet);
+      const throttledGetPins = listLimiter.wrap((options) => {
+        return client.pinsGet(options)
+      });
 
-        while (pinsExistToCheck === true) {
-            // Get 500 Successful Pins
-            let pinsGetOptions = {
-                limit: 500,
-                status: new Set([Status.Pinned, Status.Pinning, Status.Queued]) // requires a set, and not an array
-            }
-            if (earliestPinInList != null) {
-                pinsGetOptions.before = earliestPinInList
-            }
+      while (pinsExistToCheck === true) {
+          // Get 500 Successful Pins
+          let pinsGetOptions = {
+              limit: 500,
+              status: new Set([Status.Pinned, Status.Pinning, Status.Queued]) // requires a set, and not an array
+          }
+          if (earliestPinInList != null) {
+              pinsGetOptions.before = earliestPinInList
+          }
 
-            const {count, results} = await throttledGetPins(pinsGetOptions)
+          const {count, results} = await throttledGetPins(pinsGetOptions)
 
-            console.log(count, results)
-            pinList = pinList.concat(Array.from(results));
+          console.log(count, results)
+          pinList = pinList.concat(Array.from(results));
 
-            earliestPinInList = this.#getOldestPinCreateDate(results)
+          earliestPinInList = this.#getOldestPinCreateDate(results)
 
-            console.log(`Results Length: ${results.size}`)
-            if (results.size !== 1000) {
-                pinsExistToCheck = false;
-            }
-        }
+          console.log(`Results Length: ${results.size}`)
+          if (results.size !== 1000) {
+              pinsExistToCheck = false;
+          }
+      }
 
-        return pinList;
+      return pinList;
     }
 
     async sync (progressCallback) {
