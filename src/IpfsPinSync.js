@@ -151,10 +151,11 @@ export default class IpfsPinSync {
         return client.pinsGet(options)
       });
 
+      const pinsToBatch = 500;
       while (pinsExistToCheck === true) {
           // Get 500 Successful Pins
           let pinsGetOptions = {
-              limit: 500,
+              limit: pinsToBatch,
               status: new Set([Status.Pinned, Status.Pinning, Status.Queued]) // requires a set, and not an array
           }
           if (earliestPinInList != null) {
@@ -169,7 +170,7 @@ export default class IpfsPinSync {
           earliestPinInList = this.#getOldestPinCreateDate(results)
 
           console.log(`Results Length: ${results.size}`)
-          if (results.size !== 500) {
+          if (results.size !== pinsToBatch) {
               pinsExistToCheck = false;
           }
       }
@@ -182,8 +183,8 @@ export default class IpfsPinSync {
             reservoir: 25,
             reservoirRefreshInterval: 1000,
             reservoirRefreshAmount: 25,
-            maxConcurrent: 10
-        })
+            maxConcurrent: 4
+        });
         const throttledAddPin = syncLimiter.wrap(this.#addPin);
 
         const sourcePins = await this.listSource();
