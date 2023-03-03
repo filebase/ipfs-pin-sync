@@ -196,7 +196,7 @@ export default class IpfsPinSync {
                 }
             }
 
-            if (sourcePin.pin.origins.length > 0) {
+            if (typeof sourcePin.pin.origins !== "undefined" && sourcePin.pin.origins.length > 0) {
               pinPostOptions.pin.origins = sourcePin.pin.origins;
             }
 
