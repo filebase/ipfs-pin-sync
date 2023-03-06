@@ -134,7 +134,7 @@ export default class IpfsPinSync {
         let pinList = [];
 
         while (pinsExistToCheck === true) {
-            // Get 1000 Successful Pins
+            // Get 500 Successful Pins
             let pinsGetOptions = {
                 limit: 500,
                 status: new Set([Status.Pinned, Status.Pinning, Status.Queued]) // requires a set, and not an array
@@ -151,7 +151,7 @@ export default class IpfsPinSync {
             earliestPinInList = this.#getOldestPinCreateDate(results)
 
             console.log(`Results Length: ${results.size}`)
-            if (results.size !== 1000) {
+            if (results.size !== 500) {
                 pinsExistToCheck = false;
             }
         }
